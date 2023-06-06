@@ -8,7 +8,7 @@ contract called "Mundo" for the E-commerce functionality.
 The tutorial assumes you have basic development and Solidity.
 
 Prerequisites:
-
+- Basic understanding of command line tool
 - Basic knowledge of Ethereum development
 - Node.js and npm installed
 - Familiarity with JavaScript and Solidity
@@ -16,6 +16,10 @@ Prerequisites:
 ## Step 1: Set Up the Development Environment
 
 1. Create a new directory for your project and navigate to it using the command line.
+```bash
+  mkdir my-celo-project // make a directory called my-celo-project
+  cd my-celo-project // go to the directory in your command line tool
+```
 2. Initialize a new npm project by running the following command
 
 ```bash
@@ -23,11 +27,39 @@ npm init -y
 
 ```
 3. Install the required dependencies by running the following commands:
+ In this step, we will install the necessary dependencies for Celo smart contract development using npm (Node Package    Manager). These dependencies include Hardhat, the Celo plugin for Hardhat, web3.js library, ethers.js library, Chai assertion library, and dotenv library for managing environment variables.
+
+  Open your command line or terminal and navigate to the project directory you created in Step 1.
+
+  Run the following command to install the dependencies:
 
 ```bash
 npm install --save-dev hardhat @nomiclabs/hardhat-celo @nomiclabs/hardhat-web3 ethers chai @nomiclabs/hardhat-ethers dotenv
 ```
+
+Let's understand the purpose of each dependency:
+
+**hardhat**: Hardhat is a development environment and task runner for Ethereum-like networks. It provides a powerful and flexible framework for compiling, deploying, testing, and interacting with smart contracts.
+
+**@nomiclabs/hardhat-celo**: This is the Celo plugin for Hardhat, which adds support for Celo-specific functionality and network configuration to Hardhat.
+
+**@nomiclabs/hardhat-web3**: This plugin integrates web3.js library with Hardhat, allowing you to interact with Celo networks using web3.js.
+
+**ethers**: Ethers.js is a JavaScript library that provides a simple and intuitive API for interacting with Ethereum-like networks, including Celo. It makes it easy to send transactions, call contract functions, and work with smart contract ABIs.
+
+**chai**: Chai is an assertion library that provides a clean and expressive syntax for writing tests. It helps you define expectations and perform assertions in your smart contract tests.
+
+**@nomiclabs/hardhat-ethers**: This plugin integrates ethers.js library with Hardhat, providing additional utilities and functionality for smart contract development.
+
+**dotenv**: Dotenv is a module that loads environment variables from a .env file into process.env. It allows you to store sensitive information like private keys in a separate file and access them securely within your code.
+
+After running the command, npm will download and install the specified dependencies in the node_modules directory within your project.
+
+Once the installation is complete, you can proceed to the next steps to configure your development environment for Celo smart contract development.
+
 4. Create a new file called hardhat.config.js in the project directory and add the following configuration:
+
+In this step, we will create a configuration file called hardhat.config.js in the project directory. This file will define the configuration for the Hardhat development environment, including the networks to be used and their corresponding settings.
 
 ```bash
 require("@nomiclabs/hardhat-waffle");
@@ -47,14 +79,49 @@ module.exports = {
 }
 };
 ```
+Let's understand the different parts of this configuration file:
 
-This configuration file sets up the networks to be used with Hardhat, including the Celo network. It retrieves the necessary configuration values from the .env file, which we will set up in the next step.
+The first line require("@nomiclabs/hardhat-waffle"); imports the Hardhat Waffle plugin, which provides integration with the Waffle testing library.
+
+The second line require("dotenv").config({ path: ".env" }); loads the environment variables from the .env file into the process.env object. This allows us to securely access sensitive information like private keys.
+
+The solidity field specifies the version of the Solidity compiler to be used. In this case, it is set to "0.8.4", but you can change it to the desired version.
+
+The networks field defines the network configurations for Hardhat. In this example, we have configured the alfajores network, which is the Celo testnet.
+
+The url property specifies the RPC endpoint URL for the Alfajores testnet.
+
+The accounts property is an array that contains the private key(s) associated with the accounts you want to use for deployment and testing. In this example, we are retrieving the private key from the environment variable process.env.PRIVATE_KEY using dotenv.
+
+The chainId property specifies the unique identifier for the Celo network. For the Alfajores testnet, the chain ID is 44787.
+
+The mocha field defines the configuration options for the Mocha testing framework. In this example, we have set the timeout property to 500000 milliseconds, which allows a maximum of 500 seconds for running tests. You can adjust this value based on your testing requirements.
+
+Ensure that you have the correct URL for the network you want to use and replace <Your_private_key> in the accounts array with your actual private key.
+
+By configuring the hardhat.config.js file, you have set up the necessary network settings for interacting with the Celo network and defined the Solidity compiler version to be used.
 
 5. Create a new file named .env in the project root directory and add the following lines, replacing the placeholder values with your own:
+
+In this step, we will create a .env file in the project root directory. This file will store sensitive information, such as your private key, securely by using environment variables.
+
+Here's a breakdown of the steps:
+
+Create a new file named .env in the project root directory.
+
+Open the .env file in a text editor and add the following line:
 ```bash
 PRIVATE_KEY=<Your_private_key>
 ```
 Replace `<Your_private_key>` with your private key
+
+Replace <Your_private_key> with the private key corresponding to the account you want to use for deployment and testing. It is crucial to keep your private key secure and not share it publicly.
+
+The .env file allows you to store sensitive information separately from your code and provides a way to load these values into your application using the dotenv package. By following this approach, you can keep your private key and other sensitive data confidential while still being able to access them programmatically through the process.env object.
+
+Remember to save the .env file after adding the private key.
+
+Note: Ensure that you do not commit or share your .env file, as it contains sensitive information. It is recommended to add the .env file to your .gitignore file to prevent accidental commits.
 
 ## Step 2: Create the Smart Contract
 
@@ -153,8 +220,9 @@ contract Mundo {
     }
 
     function withdraw() public onlyOwner {
-        (bool success, ) = owner.call{value: address(this).balance}("");
-        require(success);
+      uint256 balance = address(this).balance;
+      require(balance > 0, "No funds to withdraw");
+      owner.transer(balance);
     }
 
       // getters function
